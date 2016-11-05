@@ -6,6 +6,7 @@ let k = 5
 
 func initCentroids() -> [Double] {
     precondition(k > 0)
+    precondition(k <= array.count)
     var centroids: [Double] = []
     while centroids.count < k {
         let rndIndex = Double(Int(rand()) % array.count)
