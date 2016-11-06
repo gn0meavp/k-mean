@@ -148,33 +148,50 @@ extension UIImage{
 }
 
 
+func save(image: UIImage, fileName: String) {
+    let imageData = NSData(data:UIImagePNGRepresentation(image)!)
+    print(NSHomeDirectory())
+    imageData.writeToFile("\(NSHomeDirectory())/\(fileName)", atomically: true)
+}
+
+/////
+
+
 let view = UIView(frame: CGRectMake(0,0,500,500))
 view.backgroundColor = UIColor.grayColor()
 
 let colors = [UIColor.greenColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.brownColor(), UIColor.cyanColor(), UIColor.yellowColor(), UIColor.magentaColor(), UIColor.orangeColor(), UIColor.purpleColor(), UIColor.blackColor()]
 
+var i = 0
+
 XCPlaygroundPage.currentPage.liveView = view
+
+
+
+
+////
 
 var array: [CGPoint] = []
 
-for _ in 0..<10 {
+for _ in 0..<100 {
     array.append(CGPoint(x: Double(rand() % 500), y: Double(rand() % 500)))
 }
 
-var centroids = array.initCentroids(2)
+var centroids = array.initCentroids(10)
 
 var clusters = array.clusters(centroids)
 var newCentroids = clusters.means()
 
-while newCentroids != centroids {
-    centroids = newCentroids
-    clusters = array.clusters(centroids)
-    newCentroids = clusters.means()
-}
-
-
 func draw() {
     view.subviews.forEach { $0.removeFromSuperview() }
+    
+    for centroid in centroids {
+        let centroidView = UIView(frame: CGRectMake(centroid.x, centroid.y, 10,10))
+        centroidView.backgroundColor = UIColor.darkGrayColor()
+        centroidView.alpha = 0.5
+        view.addSubview(centroidView)
+    }
+    
     for i in 0..<clusters.count {
         
         let cluster = clusters[i]
@@ -186,5 +203,18 @@ func draw() {
             view.addSubview(pointView)
         }
     }
-
 }
+
+while newCentroids != centroids {
+    centroids = newCentroids
+    clusters = array.clusters(centroids)
+    newCentroids = clusters.means()
+    i+=1
+    
+    draw()
+    save(UIImage.renderUIViewToImage(view), fileName: "\(i).png")
+}
+
+
+
+
