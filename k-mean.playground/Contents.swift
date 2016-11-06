@@ -162,8 +162,6 @@ view.backgroundColor = UIColor.grayColor()
 
 let colors = [UIColor.greenColor(), UIColor.redColor(), UIColor.blueColor(), UIColor.brownColor(), UIColor.cyanColor(), UIColor.yellowColor(), UIColor.magentaColor(), UIColor.orangeColor(), UIColor.purpleColor(), UIColor.blackColor()]
 
-var i = 0
-
 XCPlaygroundPage.currentPage.liveView = view
 
 
@@ -173,7 +171,7 @@ XCPlaygroundPage.currentPage.liveView = view
 
 var array: [CGPoint] = []
 
-for _ in 0..<100 {
+for _ in 0..<1000 {
     array.append(CGPoint(x: Double(rand() % 500), y: Double(rand() % 500)))
 }
 
@@ -182,14 +180,37 @@ var centroids = array.initCentroids(10)
 var clusters = array.clusters(centroids)
 var newCentroids = clusters.means()
 
+func drawLine(point1: CGPoint, point2: CGPoint) {
+    let path = UIBezierPath()
+    path.moveToPoint(point1)
+    path.addLineToPoint(point2)
+    
+    let shapeLayer = CAShapeLayer()
+    shapeLayer.path = path.CGPath
+    shapeLayer.strokeColor = UIColor.darkGrayColor().CGColor
+    shapeLayer.lineWidth = 0.25
+    
+    view.layer.addSublayer(shapeLayer)
+}
+
 func draw() {
     view.subviews.forEach { $0.removeFromSuperview() }
+    view.layer.sublayers?.removeAll()
     
     for centroid in centroids {
-        let centroidView = UIView(frame: CGRectMake(centroid.x, centroid.y, 10,10))
+        let centroidView = UIView(frame: CGRectMake(centroid.x - 5, centroid.y - 5, 10,10))
         centroidView.backgroundColor = UIColor.darkGrayColor()
         centroidView.alpha = 0.5
         view.addSubview(centroidView)
+    }
+    
+    for index in 0..<centroids.count {
+        let centroid = centroids[index]
+        let cluster = clusters[index]
+        
+        for point in cluster {
+            drawLine(centroid, point2: point)
+        }
     }
     
     for i in 0..<clusters.count {
@@ -198,23 +219,20 @@ func draw() {
         let color = colors[i]
         
         for point in cluster {
-            let pointView = UIView(frame: CGRectMake(point.x,point.y,5,5))
+            let pointView = UIView(frame: CGRectMake(point.x - 2.5,point.y - 2.5,5,5))
             pointView.backgroundColor = color
             view.addSubview(pointView)
         }
     }
+    
 }
 
 while newCentroids != centroids {
     centroids = newCentroids
     clusters = array.clusters(centroids)
     newCentroids = clusters.means()
-    i+=1
-    
-    draw()
-    save(UIImage.renderUIViewToImage(view), fileName: "\(i).png")
 }
 
-
-
+draw()
+save(UIImage.renderUIViewToImage(view), fileName: "result.png")
 
