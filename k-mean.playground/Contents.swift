@@ -4,40 +4,85 @@ protocol ItemProtocol: Hashable {
     func distanceToItem(item: Self) -> Double
 }
 
-protocol Randomable {
-    static func randomValueInRange(min min: Self, max: Self) -> Self
+protocol Meanable {
+    static func mean(array: [Self]) -> Self
 }
 
-protocol MinMaxProtocol {
-    static func getMinMax(array: [Self]) -> (min: Self?, max: Self?)
-}
+//protocol Randomable {
+//    static func randomValueInRange(min min: Self, max: Self) -> Self
+//}
+//
+//protocol MinMaxProtocol {
+//    static func getMinMax(array: [Self]) -> (min: Self?, max: Self?)
+//}
 
-extension Array where Element: ItemProtocol, Element: MinMaxProtocol, Element: Randomable {
+extension Array where Element: ItemProtocol {
     func initCentroids(k: Int) -> [Element] {
         precondition(k > 0)
         precondition(k <= count)
         
-        let minMax = Element.getMinMax(self)
-        
-        guard let min = minMax.min, max = minMax.max else {
-            return []
-        }
-        
-        var centroids = Set<Element>()
-        
-        while centroids.count < k {
-            let rnd = Element.randomValueInRange(min: min, max: max)
-            if centroids.contains(rnd) == false {
-                centroids.insert(rnd)
+        var indexes = Set<Int>()
+        while indexes.count < k {
+            let rnd = random() % count
+            if indexes.contains(rnd) == false {
+                indexes.insert(rnd)
             }
+            
+            
         }
         
-        return Array(centroids)
+        return indexes.map { self[$0] }
     }
     
-    //TODO:
-    func mean() -> Element? {
-        return nil
+    // O(n^2) solution currently
+    func clusters(centroids: [Element]) -> [[Element]] {
+        precondition(centroids.count > 0)
+        var clusters = [Element: [Element]]()
+        
+        for centroid in centroids {
+            clusters[centroid] = []
+        }
+        
+        for element in self {
+            var minDistance: Double!
+            var curCentroid: Element!
+            
+            for centroid in centroids {
+                let distance = element.distanceToItem(centroid)
+                
+                if minDistance == nil || minDistance > distance {
+                    minDistance = distance
+                    curCentroid = centroid
+                }
+            }
+            
+            var curCluster = clusters[curCentroid]
+            curCluster?.append(element)
+            clusters[curCentroid] = curCluster
+        }
+        
+        return clusters.map { $1 }
+    }
+}
+
+
+extension Array where Element: Meanable {
+    func mean() -> Element {
+        return Element.mean(self)
+    }
+}
+
+extension Array where Element: _ArrayType, Element.Generator.Element: ItemProtocol, Element.Generator.Element: Meanable {
+    func means() -> [Element.Generator.Element] {
+        
+        var array: [Element.Generator.Element] = []
+        
+        for item in self {
+            let a = item as! [Array.Element.Generator.Element]
+            array.append(a.mean())
+        }
+        
+        return array
     }
 }
 
@@ -61,65 +106,87 @@ extension CGPoint: ItemProtocol {
     }
 }
 
-extension Double: MinMaxProtocol {
-    static func getMinMax(array: [Double]) -> (min: Double?, max: Double?) {
-        guard let first = array.first else {
-            return (nil, nil)
-        }
-        
-        var curMin = first
-        var curMax = first
-        
-        for value in array {
-            curMin = min(curMin, value)
-            curMax = max(curMax, value)
-        }
-        
-        return (curMin, curMax)
+extension Double: Meanable {
+    static func mean(array: [Double]) -> Double {
+        return array.reduce(0.0) { $0 + $1 } / Double(array.count)
     }
 }
 
-extension CGPoint: MinMaxProtocol {
-    static func getMinMax(array: [CGPoint]) -> (min: CGPoint?, max: CGPoint?) {
-        guard let first = array.first else {
-            return (nil, nil)
-        }
-
-        var curMinX = first.x
-        var curMaxX = first.x
-        var curMinY = first.y
-        var curMaxY = first.y
+extension CGPoint: Meanable {
+    static func mean(array: [CGPoint]) -> CGPoint {
+        let xs = array.map { Double($0.x) }
+        let ys = array.map { Double($0.y) }
         
-        for point in array {
-            curMinX = min(curMinX, point.x)
-            curMaxX = max(curMaxX, point.x)
-            
-            curMinY = min(curMinY, point.x)
-            curMaxY = max(curMaxY, point.y)
-        }
-        
-        return (CGPoint(x: curMinX, y: curMinY), CGPoint(x: curMaxX, y: curMaxY))
+        return CGPoint(x: Double.mean(xs), y: Double.mean(ys))
     }
 }
 
-extension Double: Randomable {
-    //TODO: support cases like [1.0;1.2]
-    static func randomValueInRange(min min: Double, max: Double) -> Double {
-        return Double(rand() % Int32(max - min)) + min
-    }
-}
+//extension Double: MinMaxProtocol {
+//    static func getMinMax(array: [Double]) -> (min: Double?, max: Double?) {
+//        guard let first = array.first else {
+//            return (nil, nil)
+//        }
+//        
+//        var curMin = first
+//        var curMax = first
+//        
+//        for value in array {
+//            curMin = min(curMin, value)
+//            curMax = max(curMax, value)
+//        }
+//        
+//        return (curMin, curMax)
+//    }
+//}
+//
+//extension CGPoint: MinMaxProtocol {
+//    static func getMinMax(array: [CGPoint]) -> (min: CGPoint?, max: CGPoint?) {
+//        guard let first = array.first else {
+//            return (nil, nil)
+//        }
+//
+//        var curMinX = first.x
+//        var curMaxX = first.x
+//        var curMinY = first.y
+//        var curMaxY = first.y
+//        
+//        for point in array {
+//            curMinX = min(curMinX, point.x)
+//            curMaxX = max(curMaxX, point.x)
+//            
+//            curMinY = min(curMinY, point.x)
+//            curMaxY = max(curMaxY, point.y)
+//        }
+//        
+//        return (CGPoint(x: curMinX, y: curMinY), CGPoint(x: curMaxX, y: curMaxY))
+//    }
+//}
+//
+//extension Double: Randomable {
+//    //TODO: support cases like [1.0;1.2]
+//    static func randomValueInRange(min min: Double, max: Double) -> Double {
+//        return Double(rand() % Int32(max - min)) + min
+//    }
+//}
+//
+//extension CGFloat: Randomable {
+//    static func randomValueInRange(min min: CGFloat, max: CGFloat) -> CGFloat {
+//        return CGFloat(Double.randomValueInRange(min: Double(min), max: Double(max)))
+//    }
+//}
+//
+//extension CGPoint: Randomable {
+//    static func randomValueInRange(min min: CGPoint, max: CGPoint) -> CGPoint {
+//        return CGPoint(x: CGFloat.randomValueInRange(min: min.x, max: max.x), y: CGFloat.randomValueInRange(min: min.y, max: max.y))
+//    }
+//}
 
-extension CGFloat: Randomable {
-    static func randomValueInRange(min min: CGFloat, max: CGFloat) -> CGFloat {
-        return CGFloat(Double.randomValueInRange(min: Double(min), max: Double(max)))
-    }
-}
 
-extension CGPoint: Randomable {
-    static func randomValueInRange(min min: CGPoint, max: CGPoint) -> CGPoint {
-        return CGPoint(x: CGFloat.randomValueInRange(min: min.x, max: max.x), y: CGFloat.randomValueInRange(min: min.y, max: max.y))
-    }
-}
+
+
+
+
+
 
 //TODO: implement sample with UIColor list
 //TODO: also implement sample with CGPoints with UIColor
@@ -131,9 +198,17 @@ extension CGPoint: Randomable {
 
 
 
-//let array: [Double] = [1,3,5,7,9,10,12,12,14,15,17,18,19,22,24,26,27,29,30,31,32,35,37,49,59]
-let array: [CGPoint] = [CGPoint(x: 11, y: 52), CGPoint(x: 43, y: 24), CGPoint(x: 5, y: 57), CGPoint(x: 52, y: 4), CGPoint(x: 94, y: 22), CGPoint(x: 15, y: 56), CGPoint(x: 21, y: 47), CGPoint(x: 50, y: 14), CGPoint(x: 2, y: 86), CGPoint(x: 92, y: 25), CGPoint(x: 14, y: 34), CGPoint(x: 22, y: 27)]
-array.initCentroids(5)
+
+/////
+
+
+let array: [Double] = [1,3,5,7,9,10,12,12,14,15,17,18,19,22,24,26,27,29,30,31,32,35,37,49,59]
+//let array: [CGPoint] = [CGPoint(x: 11, y: 52), CGPoint(x: 43, y: 24), CGPoint(x: 5, y: 57), CGPoint(x: 52, y: 4), CGPoint(x: 94, y: 22), CGPoint(x: 15, y: 56), CGPoint(x: 21, y: 47), CGPoint(x: 50, y: 14), CGPoint(x: 2, y: 86), CGPoint(x: 92, y: 25), CGPoint(x: 14, y: 34), CGPoint(x: 22, y: 27)]
+let centroids = array.initCentroids(4)
+
+let clusters = array.clusters(centroids)
+let means = clusters.means()
+//array.clusters(means)
 
 
 ////
