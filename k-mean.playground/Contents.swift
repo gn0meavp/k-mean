@@ -202,13 +202,36 @@ extension CGPoint: Meanable {
 /////
 
 
-let array: [Double] = [1,3,5,7,9,10,12,12,14,15,17,18,19,22,24,26,27,29,30,31,32,35,37,49,59]
-//let array: [CGPoint] = [CGPoint(x: 11, y: 52), CGPoint(x: 43, y: 24), CGPoint(x: 5, y: 57), CGPoint(x: 52, y: 4), CGPoint(x: 94, y: 22), CGPoint(x: 15, y: 56), CGPoint(x: 21, y: 47), CGPoint(x: 50, y: 14), CGPoint(x: 2, y: 86), CGPoint(x: 92, y: 25), CGPoint(x: 14, y: 34), CGPoint(x: 22, y: 27)]
-let centroids = array.initCentroids(4)
+//let array: [Double] = [1,3,5,7,9,10,12,12,14,15,17,18,19,22,24,26,27,29,30,31,32,35,37,49,159]
 
-let clusters = array.clusters(centroids)
-let means = clusters.means()
-//array.clusters(means)
+
+//let array: [CGPoint] = [CGPoint(x: 11, y: 52), CGPoint(x: 43, y: 24), CGPoint(x: 5, y: 57), CGPoint(x: 52, y: 4), CGPoint(x: 94, y: 22), CGPoint(x: 15, y: 56), CGPoint(x: 21, y: 47), CGPoint(x: 50, y: 14), CGPoint(x: 2, y: 86), CGPoint(x: 92, y: 25), CGPoint(x: 14, y: 34), CGPoint(x: 22, y: 27)]
+
+var array: [CGPoint] = []
+
+for _ in 0..<100 {
+    array.append(CGPoint(x: Double(rand() % 1000), y: Double(rand() % 1000)))
+}
+
+
+var centroids = array.initCentroids(4)
+
+var clusters = array.clusters(centroids)
+var newCentroids = clusters.means()
+
+while newCentroids != centroids {
+    centroids = newCentroids
+    clusters = array.clusters(centroids)
+    newCentroids = clusters.means()
+}
+
+print(array)
+
+for cluster in clusters {
+ print(cluster)
+}
+
+
 
 
 ////
