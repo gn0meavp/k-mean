@@ -1,4 +1,5 @@
 import UIKit
+import MapKit
 import XCPlayground
 
 protocol ItemProtocol: Hashable {
@@ -114,6 +115,35 @@ extension CGPoint: Meanable {
     }
 }
 
+extension CLLocationCoordinate2D: Equatable {}
+
+public func ==(lhs: CLLocationCoordinate2D, rhs: CLLocationCoordinate2D) -> Bool {
+    return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+}
+
+extension CLLocationCoordinate2D: Hashable {
+    public var hashValue: Int {
+        return "\(latitude)\(longitude)".hashValue
+    }
+}
+
+extension CLLocationCoordinate2D: ItemProtocol {
+    func distanceToItem(item: CLLocationCoordinate2D) -> Double {
+        let curLocation = CLLocation(latitude: latitude, longitude: longitude)
+        let location = CLLocation(latitude: item.latitude, longitude: item.longitude)
+        return curLocation.distanceFromLocation(location)
+    }
+}
+
+extension CLLocationCoordinate2D: Meanable {
+    static func mean(array: [CLLocationCoordinate2D]) -> CLLocationCoordinate2D {
+        let latitudes = array.map { Double($0.latitude) }
+        let longitudes = array.map { Double($0.longitude) }
+        
+        return CLLocationCoordinate2D(latitude: Double.mean(latitudes), longitude: Double.mean(longitudes))
+    }
+}
+
 //TODO: implement sample with UIColor list
 //TODO: also implement sample with CGPoints with UIColor
 //extension UIColor: ItemProtocol {
@@ -171,7 +201,7 @@ XCPlaygroundPage.currentPage.liveView = view
 
 var array: [CGPoint] = []
 
-for _ in 0..<1000 {
+for _ in 0..<500 {
     array.append(CGPoint(x: Double(rand() % 500), y: Double(rand() % 500)))
 }
 
