@@ -195,7 +195,7 @@ for _ in 0..<500 {
 }
 ```
 
-And this is a result of the clusterization into 10 clusters:
+And this is a result of the clusterization into 10 clusters. Check grey centroids in a middle of the clusters:
 
 ![alt tag](https://github.com/gn0meavp/k-mean/blob/master/cgpoints.png)
 
