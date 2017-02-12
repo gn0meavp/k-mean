@@ -197,7 +197,7 @@ for _ in 0..<500 {
 
 And this is a result of the clusterization into 10 clusters:
 
-https://github.com/gn0meavp/k-mean/cgpoints.png
+![alt tag](https://github.com/gn0meavp/k-mean/blob/master/cgpoints.png)
 
 ### CLLocationCoordinate2D
 
@@ -240,7 +240,7 @@ extension CLLocationCoordinate2D: Meanable {
 
 Now let's try to clusterize 100 biggest cities in the world into 7 clusters. You could notice grey dots for centroids on the map as well.
 
-https://github.com/gn0meavp/k-mean/map.png
+![alt tag](https://github.com/gn0meavp/k-mean/blob/master/map.png)
 
 ### Colours
 
@@ -334,8 +334,8 @@ extension ColorBox: KMeanType {
 
 Here what we could get from a bunch of random colours:
 
-https://github.com/gn0meavp/k-mean/initial-colours.png
-(https://github.com/gn0meavp/k-mean/blob/master/colours.png)
+![alt tag](https://github.com/gn0meavp/k-mean/blob/master/initial-colours.png)
+![alt tag](https://github.com/gn0meavp/k-mean/blob/master/colours.png)
 
 ## References
 
