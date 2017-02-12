@@ -334,8 +334,8 @@ extension ColorBox: KMeanType {
 
 Here what we could get from a bunch of random colours:
 
-![alt tag](https://github.com/gn0meavp/k-mean/blob/master/initial-colours.png)
 ![alt tag](https://github.com/gn0meavp/k-mean/blob/master/colours.png)
+![alt tag](https://github.com/gn0meavp/k-mean/blob/master/initial-colours.png)
 
 ## References
 
