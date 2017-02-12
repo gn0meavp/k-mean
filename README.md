@@ -13,11 +13,11 @@ protocol ItemProtocol: Hashable {
 }
 ```
 
-By `distance` we mean that two items have to have some distance between them. Like for example two integers A1, A2 the distance could be `abs(A1-A2)` if we would like to clusterize integers by the difference of values.
+By `distance` we mean that two items have to have some distance between them. Like for example for two integers A1, A2 the distance could be `abs(A1-A2)` if we would like to clusterize integers by the difference of values.
 
 We made `ItemProtocol` inherited from `Hashable`, because it could give us a possibility to use Items as keys in a dictionary.
 
-We need another interface to be possible get a mean from an array of items:
+We need another interface to be possible to calculate a mean from an array of items:
 
 ```swift
 protocol KMeanType {
@@ -47,7 +47,7 @@ extension Array where Element: ItemProtocol, Element: KMeanType {
 
 Now the only thing which we needed is to make an array of `K` [centroids](https://en.wikipedia.org/wiki/Centroid) from array of items and to clusterize these centroids iteratively.
 
-We will use the same Type for centroids. Because `ItemProtocol` is `Hashable` we could create a dictionary with centroids as keys.
+We will use the same type for centroids. Because `ItemProtocol` is `Hashable` we could create a dictionary with centroids as keys.
 
 ```swift
 extension Array where Element: ItemProtocol {
@@ -332,7 +332,7 @@ extension ColorBox: KMeanType {
 }
 ```
 
-Here what we could get form a bunch of random colours:
+Here what we could get from a bunch of random colours:
 
 <TBD>
 <TBD>
